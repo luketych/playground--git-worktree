@@ -14,8 +14,6 @@ if [[ "$confirm" != "yes" ]]; then
   exit 1
 fi
 
-echo "📦 Backing up .git to .git.bak (just in case)..."
-mv .git .git.bak
 
 echo "🧹 Reinitializing Git repo..."
 git init
