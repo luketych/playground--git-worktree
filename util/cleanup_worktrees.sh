@@ -2,8 +2,21 @@
 set -euo pipefail
 
 # === Settings ===
-WORKTREE_DIR="../worktrees"
+if ! git rev-parse --git-dir > /dev/null 2>&1; then
+    echo "❌ Error: Not in a git repository"
+    exit 1
+fi
+
+# Get the repository root directory
+REPO_ROOT=$(git rev-parse --show-toplevel)
+WORKTREE_DIR="$REPO_ROOT/../worktrees"
 BRANCH_PREFIX="worktree-"
+
+# Validate worktree directory exists
+if [ ! -d "$WORKTREE_DIR" ]; then
+    echo "✅ No worktree directory found at: $WORKTREE_DIR"
+    exit 0
+fi
 
 echo "🧹 Cleaning up worktrees from: $WORKTREE_DIR"
 echo ""

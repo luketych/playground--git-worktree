@@ -1,9 +1,30 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-WORKTREE_DIR="../worktrees"
+# Ensure we're in a git repository
+if ! git rev-parse --git-dir > /dev/null 2>&1; then
+    echo "❌ Error: Not in a git repository"
+    exit 1
+fi
+
+# Get the repository root directory
+REPO_ROOT=$(git rev-parse --show-toplevel)
+WORKTREE_DIR="$REPO_ROOT/../worktrees"
 SCRIPT_NAME="${1:-demo_script.sh}"
 LOG_OUTPUT=false  # Set to true if you want to log to files instead of console
+
+# Validate that the worktree directory exists
+if [ ! -d "$WORKTREE_DIR" ]; then
+    echo "❌ Error: Worktree directory not found: $WORKTREE_DIR"
+    echo "Run './3-create_worktrees_and_branches_from_tags.sh' first"
+    exit 1
+fi
+
+# Validate that we have the script to run
+if [ ! -f "$REPO_ROOT/$SCRIPT_NAME" ]; then
+    echo "❌ Error: Script not found: $SCRIPT_NAME"
+    exit 1
+fi
 
 echo "🚀 Running '$SCRIPT_NAME' in parallel inside all registered worktrees..."
 echo ""
