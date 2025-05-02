@@ -24,24 +24,26 @@ echo ""
 # === Step 1: Get registered worktrees
 registered_worktrees=$(git worktree list --porcelain | awk '/^worktree / {print $2}')
 
-# === Step 2: Remove worktrees that are both registered AND exist
-for dir in "$WORKTREE_DIR"/*; do
-  [[ -d "$dir" ]] || continue
+# === Step 2: Force remove all worktree directories
+if [ -d "$WORKTREE_DIR" ]; then
+  echo "📂 Force removing all worktree directories..."
+  rm -rf "$WORKTREE_DIR"/*
+fi
 
-  if echo "$registered_worktrees" | grep -Fxq "$dir"; then
-    echo "📂 Removing registered worktree: $dir"
-    git worktree remove --force "$dir"
-  else
-    echo "⚠️  Skipping $dir — not registered as a worktree"
+# === Step 3: Remove any registered worktrees from git
+for worktree in $(git worktree list --porcelain | awk '/^worktree / {print $2}'); do
+  if [[ "$worktree" != "$REPO_ROOT" ]]; then
+    echo "🗑️  Removing git worktree registration for: $worktree"
+    git worktree remove --force "$worktree" || true
   fi
 done
 
-# === Step 3: Prune stale worktree metadata
+# === Step 4: Prune stale worktree metadata
 echo ""
 echo "🧹 Pruning stale Git worktree metadata..."
 git worktree prune
 
-# === Step 4: Delete branches that start with 'worktree-'
+# === Step 5: Delete branches that start with 'worktree-'
 echo ""
 echo "🧨 Deleting branches that start with '$BRANCH_PREFIX'..."
 

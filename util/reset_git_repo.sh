@@ -21,6 +21,7 @@ git add .
 git commit -m "Initial commit after full reset"
 
 echo "🔗 Setting remote..."
+git remote remove origin 2>/dev/null || true
 git remote add origin "$REMOTE_URL"
 
 echo "🚀 Force pushing to $DEFAULT_BRANCH..."
